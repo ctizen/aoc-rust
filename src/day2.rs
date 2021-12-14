@@ -14,6 +14,10 @@ pub(crate) fn calc() -> i64 {
                 _ => (0, 0)
             }
         })
-        .fold((0, 0), |acc, tuple| (acc.0 + tuple.0, acc.1 + tuple.1));
+        .fold((0, 0, 0), |acc, tuple| {
+            (acc.0 + (tuple.1 * (acc.2 + tuple.0)),
+             acc.1 + tuple.1,
+             acc.2 + tuple.0)
+        });
     folding.0 as i64 * folding.1 as i64
 }
