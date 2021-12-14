@@ -10,6 +10,6 @@ fn main() {
     let day2m = day2::calc();
     println!("Day 2 answer: {}", day2m);
 
-    let day3m = day3::calc();
-    println!("Day 3 answer: {}", day3m);
+    let (day3m, day3mlife) = day3::calc();
+    println!("Day 3 answer: {}, life rating: {}", day3m, day3mlife);
 }
