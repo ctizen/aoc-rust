@@ -1,8 +1,7 @@
-use std::fs::File;
-use std::io::{BufReader, Read};
+use crate::util;
 
 pub(crate) fn calc() -> (u32, u32) {
-    let content = read_file("input/day1.txt");
+    let content = util::read_file("input/day1.txt");
     let pieces = content.split("\n")
         .filter(|str| !str.is_empty())
         .map(|str| str.parse::<u32>().expect("Failed to parse number"))
@@ -20,12 +19,4 @@ pub(crate) fn calc() -> (u32, u32) {
         }
     }
     (measures, measures3window)
-}
-
-fn read_file(path: &str) -> String {
-    let file = File::open(path).expect("File not found");
-    let mut buf_reader = BufReader::new(file);
-    let mut contents = String::new();
-    buf_reader.read_to_string(&mut contents).expect("Failed to read file");
-    contents
 }
