@@ -2,7 +2,8 @@ use crate::util;
 
 pub(crate) fn calc() -> (u32, u32) {
     let content = util::read_file("input/day1.txt");
-    let pieces = content.split("\n")
+    let pieces = content
+        .split("\n")
         .filter(|str| !str.is_empty())
         .map(|str| str.parse::<u32>().expect("Failed to parse number"))
         .collect::<Vec<u32>>();
