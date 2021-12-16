@@ -1,28 +1,34 @@
 use crate::util;
 
 type Hits = Vec<u32>;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct BoardRow(Vec<(u32, bool)>);
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Board(Vec<BoardRow>);
 
 pub(crate) fn calc() -> u32 {
     let content = util::read_file("input/day4.txt");
     let (hits, mut boards) = parse(content);
 
-    let mut it = hits.iter();
     let mut current_num = 0u32;
-    while let None = get_winning_board(&boards) {
-        current_num = *it.next().unwrap();
-        mark_numbers(&mut boards, &current_num);
+    let mut last_board = 0;
+    for i in &hits {
+        mark_numbers(&mut boards, &i);
+        match get_unwinning_board(&boards) {
+            Some(val) => {
+                current_num = *i;
+                last_board = val;
+            },
+            None => {
+                break
+            }
+        }
     }
 
-    let board_index = match get_winning_board(&boards) {
-        Some(val) => val,
-        None => unreachable!()
-    };
+    println!("{:#?}", last_board);
 
-    println!("{} {}", current_num, count_score(&boards[board_index], current_num));
+    let lastnum = hits[hits.iter().position(|val| *val == current_num).unwrap() + 1];
+    println!("{} {}", lastnum, count_score(&boards[last_board], lastnum));
     0
 }
 
@@ -66,14 +72,11 @@ fn mark_numbers(boards: &mut Vec<Board>, target: &u32) -> () {
     })
 }
 
-fn get_winning_board(boards: &Vec<Board>) -> Option<usize> {
-    match boards.iter().position(|board| {
-        board.0.iter().any(|row| {
-            row.0.iter().all(|val| val.1 == true)
-        })
-    }) {
-        Some(val) => Some(val),
-        None => boards.iter().position(|board| {
+fn get_unwinning_board(boards: &Vec<Board>) -> Option<usize> {
+    boards.iter().rposition(|board| {
+        board.0.iter().all(|row| {
+            row.0.iter().any(|val| val.1 == false)
+        }) && {
             let mut init = vec![0; board.0.len()];
             let cols_marked = board.0.iter().fold(&mut init, |acc, row| {
                 for i in 0..row.0.len() {
@@ -81,9 +84,9 @@ fn get_winning_board(boards: &Vec<Board>) -> Option<usize> {
                 }
                 acc
             });
-            cols_marked.iter().any(|col| *col == board.0.len())
-        })
-    }
+            cols_marked.iter().all(|col| *col != board.0.len())
+        }
+    })
 }
 
 fn count_score(board: &Board, last_number: u32) -> u32 {
