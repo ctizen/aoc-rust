@@ -1,0 +1,53 @@
+use crate::util;
+
+#[derive(Debug, Clone, Copy)]
+struct Point(u16, u16);
+#[derive(Debug)]
+struct Line(Point, Point);
+
+pub(crate) fn calc() -> usize {
+    let mut biggest_point = (0, 0);
+    let content = util::read_file("input/day5.txt")
+        .lines()
+        .filter(|line| !line.is_empty())
+        .map(|line| {
+            let points = line
+                .split("->")
+                .map(str::trim)
+                .map(|point| {
+                    let coords = point
+                        .split(",")
+                        .map(|coord| coord
+                            .parse::<u16>()
+                            .expect("Failed to parse number"))
+                        .collect::<Vec<u16>>();
+                    if coords[0] > biggest_point.0 {
+                        biggest_point.0 = coords[0];
+                    }
+                    if coords[1] > biggest_point.1 {
+                        biggest_point.1 = coords[1];
+                    }
+                    Point(coords[0], coords[1])
+                })
+                .collect::<Vec<Point>>();
+            Line(points[0], points[1])
+        })
+        .filter(|line| {
+            line.0.0 == line.1.0 || line.0.1 == line.1.1
+        }).collect::<Vec<Line>>();
+
+    let mut field: Vec<u8> = vec![0; (biggest_point.0 + 1) as usize * (biggest_point.1 + 1) as usize];
+    content.iter().for_each(|line| {
+        if line.0.0 == line.1.0 { // verticals
+            for i in std::cmp::min(line.0.1, line.1.1)..=std::cmp::max(line.0.1, line.1.1) {
+                field[(i as usize * biggest_point.0 as usize + line.0.0 as usize) as usize] += 1;
+            }
+        }
+        if line.0.1 == line.1.1 { // horizontals
+            for i in std::cmp::min(line.0.0, line.1.0)..=std::cmp::max(line.0.0, line.1.0) {
+                field[(i as usize + line.0.1 as usize * biggest_point.0 as usize) as usize] += 1;
+            }
+        }
+    });
+    field.iter().filter(|val| **val > 1u8).count()
+}
