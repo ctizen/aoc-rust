@@ -11,7 +11,7 @@ pub(crate) fn read_file(path: &str) -> String {
     contents
 }
 
-pub(crate) fn dump_debug(path: &str, rowlen: usize, data: &[u8]) {
+pub(crate) fn _dump_debug(path: &str, rowlen: usize, data: &[u8]) {
     let file = File::create(path).expect("Path not found");
     let mut buf_writer = BufWriter::new(file);
     buf_writer.write(data
