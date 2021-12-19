@@ -1,4 +1,5 @@
 use crate::util;
+use crate::util::dump_debug;
 
 #[derive(Debug, Clone, Copy)]
 struct Point(u16, u16);
@@ -33,7 +34,9 @@ pub(crate) fn calc() -> usize {
             Line(points[0], points[1])
         })
         .filter(|line| {
-            line.0.0 == line.1.0 || line.0.1 == line.1.1
+            line.0.0 == line.1.0 ||
+                line.0.1 == line.1.1 ||
+                (line.1.1 as i32 - line.0.1 as i32).abs() == (line.1.0 as i32 - line.0.0 as i32).abs()
         }).collect::<Vec<Line>>();
 
     let mut field: Vec<u8> = vec![0; (biggest_point.0 + 1) as usize * (biggest_point.1 + 1) as usize];
@@ -42,12 +45,44 @@ pub(crate) fn calc() -> usize {
             for i in std::cmp::min(line.0.1, line.1.1)..=std::cmp::max(line.0.1, line.1.1) {
                 field[(i as usize * biggest_point.0 as usize + line.0.0 as usize) as usize] += 1;
             }
-        }
-        if line.0.1 == line.1.1 { // horizontals
+        } else if line.0.1 == line.1.1 { // horizontals
             for i in std::cmp::min(line.0.0, line.1.0)..=std::cmp::max(line.0.0, line.1.0) {
                 field[(i as usize + line.0.1 as usize * biggest_point.0 as usize) as usize] += 1;
             }
+        } else { // diagonals
+            if (line.1.0 > line.0.0) == (line.1.1 > line.0.1) { // up left to down right
+                // iterating over x
+                let start_x = std::cmp::min(line.0.0, line.1.0);
+                for i in start_x..=std::cmp::max(line.0.0, line.1.0) {
+                    let idx = (
+                        i as usize + (
+                            (
+                                i as usize
+                                    - start_x as usize
+                                    + std::cmp::min(line.0.1, line.1.1) as usize
+                            ) * biggest_point.0 as usize
+                        )
+                    ) as usize;
+                    field[idx] += 1;
+                }
+            } else { // left down to up right
+                // iterating over x
+                let start_x = std::cmp::min(line.0.0, line.1.0);
+                for i in start_x..=std::cmp::max(line.0.0, line.1.0) {
+                    let idx = (
+                        i as usize + (
+                            (
+                                std::cmp::max(line.0.1, line.1.1) as usize
+                                - (i as usize - start_x as usize)
+                            ) * biggest_point.0 as usize
+                        )
+                    ) as usize;
+                    field[idx] += 1;
+                }
+            }
         }
     });
+
+    // dump_debug("input/dump5.txt", biggest_point.0 as usize, field.as_slice());
     field.iter().filter(|val| **val > 1u8).count()
 }
