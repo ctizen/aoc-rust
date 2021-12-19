@@ -1,28 +1,30 @@
+use std::collections::VecDeque;
 use crate::util;
 
-pub(crate) fn calc() -> usize {
-    let mut nums = util::read_file("input/day6.txt")
+pub(crate) fn calc() -> u128 {
+    let nums = util::read_file("input/day6.txt")
         .lines()
         .next()
         .expect("Failed to read string")
         .split(",")
-        .map(|num| num.parse::<i32>().expect("Failed to parse number"))
-        .collect::<Vec<i32>>();
+        .map(|num| num.parse::<usize>().expect("Failed to parse number"))
+        .collect::<Vec<usize>>();
 
-    for _i in 0..80 {
-        next_day(&mut nums);
+    let mut counts: VecDeque<u128> = nums.iter()
+        .fold(VecDeque::from(vec![0; 9]), |mut acc, num| {
+            acc[*num] += 1;
+            acc
+        });
+
+    for _i in 0..256 {
+        next_day(&mut counts);
     }
 
-    nums.len()
+    counts.iter().fold(0, |acc, num| acc + num)
 }
 
-fn next_day(state: &mut Vec<i32>) {
-    let len = state.len();
-    for i in 0..len {
-        state[i] -= 1;
-        if state[i] < 0 {
-            state[i] = 6;
-            state.push(8);
-        }
-    }
+fn next_day(state: &mut VecDeque<u128>) {
+    let overflowed = state.pop_front().expect("Wat");
+    state.push_back(overflowed);
+    state[6] += overflowed;
 }
