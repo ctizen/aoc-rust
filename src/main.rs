@@ -25,6 +25,6 @@ fn main() {
     let day6m = day6::calc();
     println!("Day 6: {}", day6m);
 
-    let day7m = day7::calc();
-    println!("Day 7: {}", day7m);
+    let (day7m, day7m2) = day7::calc();
+    println!("Day 7: {} / {}", day7m, day7m2);
 }
