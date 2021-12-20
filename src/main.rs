@@ -5,6 +5,7 @@ mod day4;
 mod util;
 mod day5;
 mod day6;
+mod day7;
 
 fn main() {
     let (day1m, day1m3win) = day1::calc();
@@ -23,4 +24,7 @@ fn main() {
 
     let day6m = day6::calc();
     println!("Day 6: {}", day6m);
+
+    let day7m = day7::calc();
+    println!("Day 7: {}", day7m);
 }
