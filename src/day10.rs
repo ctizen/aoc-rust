@@ -1,75 +1,63 @@
 use crate::util;
 
-pub(crate) fn calc() -> u32 {
-    // ) , ] , } , >
-    let scores = (3, 57, 1197, 25137);
-    let mut found_total = (0, 0, 0, 0);
+pub(crate) fn calc() -> u128 {
+    let mut scores: Vec<u128> = Vec::new();
     util::read_file("input/day10.txt")
         .lines()
         .for_each(|line| {
             let mut stack: Vec<char> = Vec::new();
-            let mut bracket_depth = 0;
-            let mut line_failed = false;
-            let mut found = (0, 0, 0, 0);
+            let mut score = 0;
+            let mut processed_chars = 0;
             for char in line.chars() {
+                processed_chars += 1;
                 match char {
                     '{' | '[' | '<' | '(' => {
                         stack.push(char);
-                        bracket_depth += 1;
                     },
                     ')' => {
-                        bracket_depth -= 1;
                         if *stack.last().expect("Char not found") == '(' {
                             stack.pop();
                         } else {
-                            if !line_failed {
-                                found.0 += scores.0;
-                            }
-                            line_failed = true;
+                            break;
                         }
                     },
                     ']' => {
-                        bracket_depth -= 1;
                         if *stack.last().expect("Char not found") == '[' {
                             stack.pop();
                         } else {
-                            if !line_failed {
-                                found.1 += scores.1;
-                            }
-                            line_failed = true;
+                            break;
                         }
                     },
                     '}' => {
-                        bracket_depth -= 1;
                         if *stack.last().expect("Char not found") == '{' {
                             stack.pop();
                         } else {
-                            if !line_failed {
-                                found.2 += scores.2;
-                            }
-                            line_failed = true;
+                            break;
                         }
                     },
                     '>' => {
-                        bracket_depth -= 1;
                         if *stack.last().expect("Char not found") == '<' {
                             stack.pop();
                         } else {
-                            if !line_failed {
-                                found.3 += scores.3;
-                            }
-                            line_failed = true;
+                            break;
                         }
                     },
                     _ => unreachable!()
                 }
             }
-            // if bracket_depth == 0 {
-                found_total.0 += found.0;
-                found_total.1 += found.1;
-                found_total.2 += found.2;
-                found_total.3 += found.3;
-            // }
+
+            if processed_chars == line.len() {
+                stack.reverse();
+                stack.iter().for_each(|char| match *char {
+                    '(' => score = score * 5 + 1,
+                    '[' => score = score * 5 + 2,
+                    '{' => score = score * 5 + 3,
+                    '<' => score = score * 5 + 4,
+                    _ => unreachable!()
+                });
+                scores.push(score);
+            }
         });
-    found_total.0 + found_total.1 + found_total.2 + found_total.3
+    scores.sort();
+    scores[scores.len() / 2]
 }
