@@ -19,7 +19,7 @@ impl Flashing for Octopus {
     }
 }
 
-pub(crate) fn calc() -> u32 {
+pub(crate) fn calc() -> (u32, u32) {
     let mut octopi = util::read_file("input/day11.txt")
         .lines()
         .filter(|str| !str.is_empty())
@@ -34,10 +34,17 @@ pub(crate) fn calc() -> u32 {
         .collect::<Vec<Vec<Octopus>>>();
 
     let mut count = 0;
+    let mut sync_step = 0;
     for _i in 0..100 {
         count += run_step(&mut octopi);
     }
-    count
+    for i in 1..1000 {
+        if run_step(&mut octopi) as usize == octopi.len() * octopi[0].len() {
+            sync_step = i + 100;
+            break;
+        }
+    }
+    (count, sync_step)
 }
 
 fn run_step(octopi: &mut Vec<Vec<Octopus>>) -> u32 /* flash count */ {

@@ -41,6 +41,6 @@ fn main() {
     let day10m = day10::calc();
     println!("Day 10: {}", day10m);
 
-    let day11m = day11::calc();
-    println!("Day 11: {}", day11m);
+    let (day11m, day11m2) = day11::calc();
+    println!("Day 11: {} / {}", day11m, day11m2);
 }
